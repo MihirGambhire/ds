@@ -1,0 +1,49 @@
+# Step 1: Import Required Libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Step 2: Load the Iris Dataset from URL
+url = "Iris.csv"
+df = pd.read_csv(url)
+
+# Step 3: Basic Data Overview
+print(" First 5 rows:\n", df.head())
+print("\n Last 5 rows:\n", df.tail())
+print("\n Dataset shape (rows, columns):", df.shape)
+print("\n Column names:", df.columns.tolist())
+print("\n Data types:\n", df.dtypes)
+print("\n Dataset Info:")
+df.info()
+
+# Step 4: Data Preprocessing
+print("\n Check for missing values:\n", df.isnull().sum())
+print("\n Descriptive statistics:\n", df.describe())
+
+# Step 5: Accessing Data Using iloc and loc
+print("\n iloc (row 0-4, first 3 columns):\n", df.iloc[0:5, 0:3])
+print("\n loc (first 5 rows, all columns):\n", df.loc[0:4, :])
+
+# Step 6: Value counts for the target variable
+print("\n Value counts of species:\n", df['Species'].value_counts())
+
+# Step 7: Data Formatting and Normalization
+# Convert all numeric columns to float
+for col in df.columns[:-1]:  # Exclude 'species'
+    df[col] = pd.to_numeric(df[col], errors='coerce')
+
+# Normalization using MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+df[df.columns[:-1]] = scaler.fit_transform(df[df.columns[:-1]])
+
+# Step 8: Convert Categorical to Quantitative
+df['Species'] = df['Species'].astype('category')         # Convert to category
+df['Species_cat'] = df['Species'].cat.codes              # Encode to numbers
+
+# Step 9: Post-Processing Checks
+print("\n Updated Data Types:\n", df.dtypes)
+print("\n DataFrame Shape After Adding Encoded Column:", df.shape)
+print("\n Encoded class mapping:")
+print(dict(enumerate(df['Species'].cat.categories)))
