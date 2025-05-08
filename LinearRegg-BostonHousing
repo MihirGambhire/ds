@@ -1,0 +1,73 @@
+# Import required libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+
+# Load the dataset from CSV file (downloaded from Kaggle)
+try:
+    df = pd.read_csv('housing.csv')  # Ensure the file name matches
+    print("Dataset loaded successfully.\n")
+except FileNotFoundError:
+    print("Error: BostonHousing.csv file not found. Please check the path.")
+
+
+# Show first 5 rows of the dataset
+print("Preview of the dataset:")
+print(df.head())
+
+
+# Check column names and dataset info
+print("\nDataset info:")
+print(df.info())
+
+
+# Use the correct column name for target: 'medv' (lowercase)
+if 'MEDV' not in df.columns:
+    raise ValueError("Expected target column 'medv' not found in dataset.")
+
+
+# Split data into features and target variable
+X = df.drop('MEDV', axis=1)  # Features
+y = df['MEDV']               # Target (House price)
+
+
+# Handle missing values (e.g., 'rm' has missing values)
+if X.isnull().sum().any():
+    X = X.fillna(X.mean())  # Filling missing values with column mean
+    print("\nMissing values filled with column means.")
+
+
+# Train-test split (80% training, 20% testing)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+# Initialize and train the model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+
+# Predict on test data
+y_pred = model.predict(X_test)
+
+
+# Evaluate the model
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+print(f"\nModel Evaluation:")
+print(f"Mean Squared Error (MSE): {mse:.2f}")
+print(f"R^2 Score: {r2:.2f}")
+
+
+# Plot Actual vs Predicted Prices
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x=y_test, y=y_pred)
+plt.xlabel("Actual Prices (in $1000s)")
+plt.ylabel("Predicted Prices (in $1000s)")
+plt.title("Actual vs Predicted Home Prices")
+plt.grid(True)
+plt.show()
