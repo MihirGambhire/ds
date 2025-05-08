@@ -1,0 +1,29 @@
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
+# Load the Titanic dataset
+titanic = sns.load_dataset('titanic')
+
+
+# Drop rows where 'age' is missing
+titanic = titanic.dropna(subset=['age'])
+
+
+# Set the plot size
+plt.figure(figsize=(10, 6))
+
+
+# Create the boxplot
+sns.boxplot(data=titanic, x='sex', y='age', hue='survived')
+
+
+# Add labels and title
+plt.title('Age Distribution by Gender and Survival Status on the Titanic')
+plt.xlabel('Gender')
+plt.ylabel('Age')
+plt.legend(title='Survived', labels=['No', 'Yes'])
+
+
+# Show the plot
+plt.show()
