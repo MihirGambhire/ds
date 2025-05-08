@@ -1,0 +1,61 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
+# Create a sample dataset
+data = {
+    'StudentID': range(1, 11),
+    'Maths_Marks': [78, 85, 90, np.nan, 45, 99, 65, 82, 105, 88],  # 105 is outlier
+    'English_Marks': [72, 88, 95, 66, 50, 94, 60, 70, 76, 91],
+    'Attendance (%)': [85, 90, 88, 70, np.nan, 100, 92, 60, 95, 98],
+    'Study_Hours_per_week': [10, 15, 12, 5, 2, 25, 18, 8, 30, 20]
+}
+
+
+df = pd.DataFrame(data)
+print(df)
+
+
+print("Missing Values:\n", df.isnull().sum())
+
+
+df['Maths_Marks'] = df['Maths_Marks'].fillna(df['Maths_Marks'].mean())
+df['Attendance (%)'] = df['Attendance (%)'].fillna(df['Attendance (%)'].median())
+print(df)
+
+
+Q1 = df['Maths_Marks'].quantile(0.25)
+Q3 = df['Maths_Marks'].quantile(0.75)
+IQR = Q3 - Q1
+
+
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+
+
+print(f"Lower bound: {lower_bound}, Upper bound: {upper_bound}")
+
+
+# Filter out outliers
+outliers = df[(df['Maths_Marks'] < lower_bound) | (df['Maths_Marks'] > upper_bound)]
+print("Outliers in Maths Marks:\n", outliers)
+
+
+df['Maths_Marks'] = np.where(df['Maths_Marks'] > upper_bound, upper_bound,
+                             np.where(df['Maths_Marks'] < lower_bound, lower_bound, df['Maths_Marks']))
+print(df['Maths_Marks'])
+
+
+sns.histplot(df['Study_Hours_per_week'], kde=True)
+plt.title("Before Transformation")
+plt.show()
+
+
+df['Log_Study_Hours'] = np.log1p(df['Study_Hours_per_week'])  # log(1+x)
+
+
+sns.histplot(df['Log_Study_Hours'], kde=True)
+plt.title("After Log Transformation")
+plt.show()
