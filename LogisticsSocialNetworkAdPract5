@@ -1,0 +1,99 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
+
+
+# Load dataset
+data = pd.read_csv('Social_Network_Ads.csv')
+print(data.head())
+
+
+# Select features and target
+X = data[['Age', 'EstimatedSalary']]
+y = data['Purchased']
+
+
+# Feature Scaling
+sc = StandardScaler()
+X_scaled = sc.fit_transform(X)
+
+
+# Split into train and test
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.25, random_state=0)
+
+
+# Logistic Regression model
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+
+# Confusion Matrix
+cm = confusion_matrix(y_test, y_pred)
+TN, FP, FN, TP = cm.ravel()
+# Metrics
+accuracy = accuracy_score(y_test, y_pred)
+error_rate = 1 - accuracy
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+# Print metrics
+print("Confusion Matrix:")
+print(cm)
+print(f"\nTP: {TP}, FP: {FP}, TN: {TN}, FN: {FN}")
+print(f"Accuracy: {accuracy:.2f}")
+print(f"Error Rate: {error_rate:.2f}")
+print(f"Precision: {precision:.2f}")
+print(f"Recall: {recall:.2f}")
+
+
+import seaborn as sns
+
+
+# Plot confusion matrix
+plt.figure(figsize=(6, 6))
+sns.heatmap(cm, annot=True, fmt='g', cmap='Blues', xticklabels=['Predicted No', 'Predicted Yes'], yticklabels=['Actual No', 'Actual Yes'])
+plt.title('Confusion Matrix')
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.show()
+
+
+
+
+
+
+
+#(Optional)
+# Plot the Decision Boundary for Logistic Regression
+X_set, y_set = X_train, y_train
+
+
+# Create a grid for plotting
+x1, x2 = np.meshgrid(np.arange(start=X_set[:, 0].min() - 1, stop=X_set[:, 0].max() + 1, step=0.01),
+                     np.arange(start=X_set[:, 1].min() - 1, stop=X_set[:, 1].max() + 1, step=0.01))
+
+
+# Predict for each point in the grid
+Z = model.predict(np.array([x1.ravel(), x2.ravel()]).T)
+Z = Z.reshape(x1.shape)
+
+
+# Plot the decision boundary
+plt.contourf(x1, x2, Z, alpha=0.3)
+plt.xlim(X_set[:, 0].min() - 1, X_set[:, 0].max() + 1)
+plt.ylim(X_set[:, 1].min() - 1, X_set[:, 1].max() + 1)
+
+
+# Plot the points
+sns.scatterplot(x=X_set[:, 0], y=X_set[:, 1], hue=y_set, palette='coolwarm', s=60, edgecolor='k')
+plt.title('Logistic Regression Decision Boundary')
+plt.xlabel('Age')
+plt.ylabel('Estimated Salary')
+plt.show()
