@@ -1,0 +1,57 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load Iris dataset from seaborn
+df = sns.load_dataset('iris')
+
+# Group by species and get summary statistics
+grouped_stats = df.groupby('species').agg(['mean', 'median', 'min', 'max', 'std'])
+
+# Print summary statistics
+print(grouped_stats)
+
+# Create a dictionary with species as keys and list of sepal_lengths as values
+sepal_length_by_species = df.groupby('species')['sepal_length'].apply(list).to_dict()
+print(sepal_length_by_species)
+
+# PART 2: Statistical Summary of Each Iris Species
+# Filter data for each species
+setosa = df[df['species'] == 'setosa']
+versicolor = df[df['species'] == 'versicolor']
+virginica = df[df['species'] == 'virginica']
+
+# Function to display statistics
+def display_stats(data, name):
+    print(f"\nStatistics for {name}:\n")
+    print(data.describe(percentiles=[.25, .5, .75]))
+
+# Show stats
+display_stats(setosa, "Iris-setosa")
+display_stats(versicolor, "Iris-versicolor")
+display_stats(virginica, "Iris-virginica")
+
+# PART 3: Visualization
+
+# Line Plot: Average measurements for each species
+mean_values = df.groupby('species').mean(numeric_only=True).reset_index()
+mean_values_melted = mean_values.melt(id_vars='species', var_name='Feature', value_name='Mean')
+
+plt.figure(figsize=(10,8 ))
+sns.lineplot(data=mean_values_melted, x='Feature', y='Mean', hue='species', marker='o')
+plt.title('Mean Feature Values per Iris Species (Line Plot)')
+plt.ylabel('Mean Value')
+plt.xlabel('Feature')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# Bar Plot: Average Sepal Length per Species
+plt.figure(figsize=(5, 5))
+sns.barplot(data=df, x='species', y='sepal_length', estimator='mean', ci='sd')
+plt.title('Average Sepal Length per Species (Bar Plot)')
+plt.ylabel('Sepal Length (Mean ± SD)')
+plt.xlabel('Species')
+plt.grid(axis='y')
+plt.tight_layout()
+plt.show()
