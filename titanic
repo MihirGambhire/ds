@@ -1,0 +1,20 @@
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
+# Load Titanic dataset
+titanic = sns.load_dataset('titanic')
+
+
+# Display first few rows (optional, for understanding)
+print(titanic.head())
+
+
+# Plot histogram for 'fare'
+plt.figure(figsize=(10, 6))
+sns.histplot(data=titanic, x='fare', kde=True, bins=30, color='skyblue')
+plt.title('Distribution of Fare Prices')
+plt.xlabel('Fare')
+plt.ylabel('Number of Passengers')
+plt.grid(True)
+plt.show()
