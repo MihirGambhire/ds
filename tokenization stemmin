@@ -1,0 +1,65 @@
+import nltk
+import string
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk import pos_tag
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+import pandas as pd
+
+
+# Download required resources
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+nltk.download('punkt_tab')
+nltk.download('averaged_perceptron_tagger_eng')
+
+
+sample_doc = """Natural language processing (NLP) is a field of artificial intelligence 
+that gives computers the ability to read, understand, and derive meaning from human languages."""
+
+#tokenise
+tokens = word_tokenize(sample_doc)
+print("Tokens:", tokens)
+
+pos_tags = pos_tag(tokens)
+print("POS Tags:", pos_tags)
+
+stop_words = set(stopwords.words('english'))
+filtered_tokens = [word for word in tokens if word.lower() not in stop_words]
+print("After Stopword Removal:", filtered_tokens)
+
+stemmer = PorterStemmer()
+stemmed = [stemmer.stem(word) for word in filtered_tokens]
+print("Stemmed Tokens:", stemmed)
+
+lemmatizer = WordNetLemmatizer()
+lemmatized = [lemmatizer.lemmatize(word) for word in filtered_tokens]
+print("Lemmatized Tokens:", lemmatized)
+
+
+#part2
+#TF-IDF Representation
+documents = [
+    "Natural Language Processing helps computers understand human language.",
+    "Artificial Intelligence includes machine learning and NLP.",
+    "Text preprocessing includes tokenization, stemming, and lemmatization."
+]
+
+# Initialize TF-IDF Vectorizer
+vectorizer = TfidfVectorizer()
+
+# Fit and transform documents
+tfidf_matrix = vectorizer.fit_transform(documents)
+
+# Convert to DataFrame for readability
+tfidf_df = pd.DataFrame(tfidf_matrix.toarray(), columns=vectorizer.get_feature_names_out())
+print(tfidf_df)
+
+
+
+
+
